@@ -31,33 +31,35 @@ jobs:
         run: pip install flake8
 
       - name: Run flake8
-        test:
-          needs: lint
-          runs-on: ubuntu-latest
-          strategy:
-            matrix:
-              python-version: ["3.9", "3.10"]
+        run: flake8 .
 
-          steps:
-            - name: Check out code
-              uses: actions/checkout@v3
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
 
-            - name: Set up Python
-              id: setup-python
-              uses: actions/setup-python@v3
-              with:
-                python-version: ${{ matrix.python-version }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
 
-            - name: Cache pip dependencies
-              uses: actions/cache@v3
-              with:
-                path: ~/.cache/pip
-                key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
-                restore-keys: |
-                  ${{ runner.os }}-pip-
+      - name: Set up Python
+        id: setup-python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
 
-            - name: Install pytest
-              run: pip install pytest
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-            - name: Run tests
-              run: pytest
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run tests
+        run: pytest
